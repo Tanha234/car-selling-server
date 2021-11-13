@@ -6,6 +6,7 @@ const { query } = require('express');
 const ObjectId=require('mongodb').ObjectId;
 const { MongoClient } = require('mongodb');
 
+
 const port=process.env.PORT||7000;
 
 
@@ -21,6 +22,39 @@ async function run(){
         client.connect();
         const database=client.db("cars-server");
         const carsCollection=database.collection('cars');
+        const ordersCollection=database.collection('orders');
+
+        app.post('/orders',async(req,res)=>{
+
+            
+                const order=req.body;
+                
+                console.log("hit the post ",order)
+    
+                const result= await ordersCollection.insertOne(order);
+                   console.log(result)
+                 res.json(result)
+    
+            
+        })
+        app.get('/orders',async(req,res)=>{
+            const cursors=ordersCollection.find({});
+            const results= await cursors.toArray();
+            res.send(results);
+       
+
+    })
+    //     //delete api
+        app.delete('/orders/:id',async(req,res)=>{
+            const id=req.params.id;
+            const query={_id:ObjectId(id)};
+            const result=await ordersCollection.deleteOne(query)
+            console.log("Deleting mens removed for forever",result)
+            res.json(result)
+
+
+        })
+         
 
         app.post('/cars',async(req,res)=>{
             const car=req.body;

@@ -23,6 +23,78 @@ async function run(){
         const database=client.db("cars-server");
         const carsCollection=database.collection('cars');
         const ordersCollection=database.collection('orders');
+        const reviewCollection=database.collection('review');
+        const userCollection=database.collection('user');
+        app.post('/user',async(req,res)=>{
+
+            
+            const user=req.body;
+            
+            console.log("hit the post ",user)
+
+            const resul= await userCollection.insertOne(user);
+               console.log(resul)
+             res.json('resul')
+
+        
+    })
+    app.get('/user',async(req,res)=>{
+        const curso=userCollection.find({});
+        const resultt= await curso.toArray();
+        res.send(resultt);
+    })
+    app.put('/user', async (req, res) => {
+        const user = req.body;
+        const filter = { email: user.email };
+        const options = { upsert: true };
+        const updateDoc = { $set: user };
+        const result = await userCollection.updateOne(filter, updateDoc, options);
+        res.json(result);
+    });
+
+    app.put('/user/admin', async (req, res) => {
+        const user = req.body;
+        console.log('put',user)
+      
+       
+         
+                const filter = { email: user.email };
+                const updateDoc = { $set: { role: 'admin' } };
+                const result = await userCollection.updateOne(filter, updateDoc);
+                res.json(result);
+          
+
+    })
+    app.get('/user/:email', async (req, res) => {
+        const email = req.params.email;
+        const query = { email: email };
+        const user = await userCollection.findOne(query);
+        let isAdmin = false;
+        if (user?.role === 'admin') {
+            isAdmin = true;
+        }
+        res.json({ admin: isAdmin });
+    })
+
+
+        app.post('/review',async(req,res)=>{
+
+            
+            const review=req.body;
+            
+            console.log("hit the post ",review)
+
+            const resultt= await reviewCollection.insertOne(review);
+               console.log(resultt)
+             res.json('result')
+
+        
+    })
+    app.get('/review',async(req,res)=>{
+        const cursorss=reviewCollection.find({});
+        const resultss= await cursorss.toArray();
+        res.send(resultss);
+    })
 
         app.post('/orders',async(req,res)=>{
 
